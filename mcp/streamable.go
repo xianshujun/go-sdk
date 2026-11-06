@@ -596,13 +596,7 @@ func (h *StreamableHTTPHandler) ephemeralConnectOpts(req *http.Request) (*epheme
 }
 
 func connectStreamable(ctx context.Context, server *Server, transport *StreamableServerTransport, opts *ServerSessionOptions) (*ServerSession, error) {
-	s, err := server.Connect(ctx, transport, opts)
-	if err != nil {
-		return nil, err
-	}
-	transport.connection.server = server
-	transport.connection.toolLookup = server.getServerTool
-	return s, nil
+	return server.Connect(ctx, transport, opts)
 }
 
 func (h *StreamableHTTPHandler) newStreamableServerTransport(sessionID string, stateless bool) *StreamableServerTransport {

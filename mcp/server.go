@@ -1583,6 +1583,16 @@ func (s *Server) Connect(ctx context.Context, t Transport, opts *ServerSessionOp
 		return nil, err
 	}
 
+	// A StreamableServerTransport consults the server's receiving method set
+	// and tool metadata when validating incoming POST requests. Set the
+	// back-reference here so that a direct Server.Connect (for example, when
+	// resuming a session on another replica) gets the same wiring as
+	// connectStreamable.
+	if st, ok := t.(*StreamableServerTransport); ok && st.connection != nil {
+		st.connection.server = s
+		st.connection.toolLookup = s.getServerTool
+	}
+
 	// Compute the protocol versions this session can serve, filtered by the
 	// transport's capabilities (if it implements [ProtocolVersionSupporter]).
 	// The list is consumed by the SEP-2575 server/discover handler.
